@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Instagram Reel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px;
+            font-size: 16px;
+        }
+        #response {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Submit Instagram Reel Link</h2>
+
+    <input type="text" id="reel_url" placeholder="Enter Instagram Reel URL" required>
+    <button onclick="submitReel()">Submit</button>
+
+    <p id="response"></p>
+
+    <h3>Submitted Reels</h3>
+    <ul id="reelList"></ul>
+
+    <script>
+        const API_URL = "https://43c42a16-3820-4c58-902c-f8e8e670c8a8-00-j5oz0gbb3yg0.sisko.replit.dev";  
+        // Replace with your actual API URL
+
+        async function submitReel() {
+            const reelUrl = document.getElementById("reel_url").value;
+            if (!reelUrl) {
+                document.getElementById("response").innerText = "Please enter a valid Instagram Reel URL!";
+                return;
+            }
+
+            const response = await fetch(`${API_URL}/submit`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ reel_url: reelUrl })
+            });
+
+            const data = await response.json();
+            document.getElementById("response").innerText = data.message;
+            document.getElementById("reel_url").value = "";  // Clear input
+            fetchReels();  // Refresh list
+        }
+
+        async function fetchReels() {
+            const response = await fetch(`${API_URL}/reels`);
+            const reels = await response.json();
+            const reelList = document.getElementById("reelList");
+
+            reelList.innerHTML = "";
+            reels.forEach(reel => {
+                const li = document.createElement("li");
+                li.textContent = reel.reel_url + " (" + reel.status + ")";
+                reelList.appendChild(li);
+            });
+        }
+
+        fetchReels();  // Load reels on page load
+    </script>
+
+</body>
+</html>
