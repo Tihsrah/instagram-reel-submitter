@@ -79,6 +79,19 @@
         }
 
         fetchLatestReel();
+
+        // --- Keep Replit Server Alive Every 1 Minute ---
+        function keepReplitAlive() {
+            fetch(API_URL)
+                .then(response => console.log("Pinged Replit:", response.status))
+                .catch(error => console.error("Replit Ping Failed:", error));
+        }
+
+        // Run every 60 seconds
+        setInterval(keepReplitAlive, 60000); 
+
+        // Run once on page load
+        keepReplitAlive();
     </script>
 
 </body>
