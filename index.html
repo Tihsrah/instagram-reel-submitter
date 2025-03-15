@@ -19,6 +19,18 @@
             margin-top: 20px;
             font-weight: bold;
         }
+        video {
+            width: 100%;
+            max-width: 500px;
+            margin-top: 20px;
+        }
+        #copyLink {
+            display: block;
+            margin-top: 10px;
+            color: blue;
+            text-decoration: underline;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -33,9 +45,15 @@
     <h3>Submitted Reels</h3>
     <ul id="reelList"></ul>
 
+    <h3>Latest Posted Reel</h3>
+    <video id="latestVideo" controls>
+        <source id="videoSource" src="" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <p id="copyLink" onclick="copyVideoLink()">Copy Video Link</p>
+
     <script>
         const API_URL = "https://43c42a16-3820-4c58-902c-f8e8e670c8a8-00-j5oz0gbb3yg0.sisko.replit.dev";  
-        // Replace with your actual API URL
 
         async function submitReel() {
             const reelUrl = document.getElementById("reel_url").value;
@@ -52,8 +70,9 @@
 
             const data = await response.json();
             document.getElementById("response").innerText = data.message;
-            document.getElementById("reel_url").value = "";  // Clear input
-            fetchReels();  // Refresh list
+            document.getElementById("reel_url").value = "";  
+            fetchReels();
+            fetchLatestReel(); 
         }
 
         async function fetchReels() {
@@ -69,7 +88,28 @@
             });
         }
 
-        fetchReels();  // Load reels on page load
+        async function fetchLatestReel() {
+            const response = await fetch(`${API_URL}/latest-reel`);
+            const latestReel = await response.json();
+
+            if (latestReel && latestReel.video_url) {
+                document.getElementById("videoSource").src = latestReel.video_url;
+                document.getElementById("latestVideo").load();
+                document.getElementById("copyLink").setAttribute("data-url", latestReel.video_url);
+            }
+        }
+
+        function copyVideoLink() {
+            const videoUrl = document.getElementById("copyLink").getAttribute("data-url");
+            if (videoUrl) {
+                navigator.clipboard.writeText(videoUrl).then(() => {
+                    alert("Video link copied to clipboard!");
+                });
+            }
+        }
+
+        fetchReels();
+        fetchLatestReel();
     </script>
 
 </body>
