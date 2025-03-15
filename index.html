@@ -15,50 +15,35 @@
             margin: 10px;
             font-size: 16px;
         }
-        #response {
-            margin-top: 20px;
-            font-weight: bold;
-        }
         video {
             width: 100%;
             max-width: 500px;
             margin-top: 20px;
         }
-        #copyLink {
-            display: block;
-            margin-top: 10px;
-            color: blue;
-            text-decoration: underline;
-            cursor: pointer;
-        }
     </style>
 </head>
 <body>
 
-    <h2>Submit Instagram Reel Link</h2>
+    <h2>Submit Instagram Reel</h2>
 
-    <input type="text" id="reel_url" placeholder="Enter Instagram Reel URL" required>
+    <input type="text" id="reel_url" placeholder="Enter Instagram Reel URL">
     <button onclick="submitReel()">Submit</button>
 
-    <p id="response"></p>
-
-    <h3>Submitted Reels</h3>
-    <ul id="reelList"></ul>
-
-    <h3>Latest Posted Reel</h3>
+    <h3>Latest Processed Reel</h3>
     <video id="latestVideo" controls>
         <source id="videoSource" src="" type="video/mp4">
         Your browser does not support the video tag.
     </video>
-    <p id="copyLink" onclick="copyVideoLink()">Copy Video Link</p>
+    <br>
+    <button id="copyButton" onclick="copyLink()">Copy Video Link</button>
 
     <script>
-        const API_URL = "https://43c42a16-3820-4c58-902c-f8e8e670c8a8-00-j5oz0gbb3yg0.sisko.replit.dev";  
+        const API_URL = "https://43c42a16-3820-4c58-902c-f8e8e670c8a8-00-j5oz0gbb3yg0.sisko.replit.dev";
 
         async function submitReel() {
             const reelUrl = document.getElementById("reel_url").value;
             if (!reelUrl) {
-                document.getElementById("response").innerText = "Please enter a valid Instagram Reel URL!";
+                alert("Please enter a valid Instagram Reel URL!");
                 return;
             }
 
@@ -69,38 +54,23 @@
             });
 
             const data = await response.json();
-            document.getElementById("response").innerText = data.message;
+            alert(data.message);
             document.getElementById("reel_url").value = "";  
-            fetchReels();
-            fetchLatestReel(); 
-        }
-
-        async function fetchReels() {
-            const response = await fetch(`${API_URL}/reels`);
-            const reels = await response.json();
-            const reelList = document.getElementById("reelList");
-
-            reelList.innerHTML = "";
-            reels.forEach(reel => {
-                const li = document.createElement("li");
-                li.textContent = reel.reel_url + " (" + reel.status + ")";
-                reelList.appendChild(li);
-            });
+            fetchLatestReel();  
         }
 
         async function fetchLatestReel() {
             const response = await fetch(`${API_URL}/latest-reel`);
-            const latestReel = await response.json();
-
-            if (latestReel && latestReel.video_url) {
-                document.getElementById("videoSource").src = latestReel.video_url;
+            const data = await response.json();
+            if (data.video_url) {
+                document.getElementById("videoSource").src = data.video_url;
                 document.getElementById("latestVideo").load();
-                document.getElementById("copyLink").setAttribute("data-url", latestReel.video_url);
+                document.getElementById("copyButton").setAttribute("data-url", data.video_url);
             }
         }
 
-        function copyVideoLink() {
-            const videoUrl = document.getElementById("copyLink").getAttribute("data-url");
+        function copyLink() {
+            const videoUrl = document.getElementById("copyButton").getAttribute("data-url");
             if (videoUrl) {
                 navigator.clipboard.writeText(videoUrl).then(() => {
                     alert("Video link copied to clipboard!");
@@ -108,7 +78,6 @@
             }
         }
 
-        fetchReels();
         fetchLatestReel();
     </script>
 
